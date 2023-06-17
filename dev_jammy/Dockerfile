@@ -14,10 +14,15 @@ ENV DEBIAN_FRONTEND=noninteractive \
     KASM_RX_HOME=$STARTUPDIR/kasmrx \
     DONT_PROMPT_WSL_INSTALL="No_Prompt_please" \
     INST_DIR=$STARTUPDIR/install \
-    INST_SCRIPTS="/install_vs_code.sh"
+    INST_SCRIPTS="/install_vs_code.sh \
+                  /install_chrome.sh \
+                  /install_tools.sh \
+                  /install_tools_deluxe.sh \
+                  /install_composer.sh \
+                  /install_nextcloud.sh"
 
 # Copy install scripts
-COPY ./src/ $INST_DIR
+COPY ./install/ $INST_DIR
 
 # Install PHP
 RUN apt-get update && apt-get install -y \
@@ -30,18 +35,18 @@ RUN apt-get update && apt-get install -y \
         zip \
         curl \
         unzip \
-    && docker-php-ext-configure gd \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
-    && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install exif \
-    && docker-php-ext-install pdo \
-    && docker-php-ext-install pgsql \
-    && docker-php-ext-install pdo_pgsql \
-    && docker-php-source delete 
+        php-mysqli \
+        php-mysql \
+        php-zip \
+        php-exif \
+        php-pdo \
+        php-pgsql
 
+# Setup sudo support
+RUN apt-get update \
+    && apt-get install -y sudo \
+    && echo 'kasm-user ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && rm -rf /var/lib/apt/list/*
 
 # Run installations
 RUN \
@@ -54,8 +59,6 @@ RUN \
   mkdir -p /home/kasm-user && \
   chown -R 1000:0 /home/kasm-user && \
   rm -Rf ${INST_DIR}
-
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Userspace Runtime
 ENV HOME /home/kasm-user
