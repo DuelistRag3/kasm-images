@@ -8,21 +8,27 @@ ENV HOME /home/kasm-default-profile
 ENV STARTUPDIR /dockerstartup
 WORKDIR $HOME
 
+######### Customize Container Here ###########
+
 ### Envrionment config
 ENV DEBIAN_FRONTEND=noninteractive \
     SKIP_CLEAN=true \
     KASM_RX_HOME=$STARTUPDIR/kasmrx \
     DONT_PROMPT_WSL_INSTALL="No_Prompt_please" \
     INST_DIR=$STARTUPDIR/install \
-    INST_SCRIPTS="/install_vs_code.sh \
-                  /install_chrome.sh \
-                  /install_tools.sh \
-                  /install_tools_deluxe.sh \
-                  /install_composer.sh \
-                  /install_nextcloud.sh"
+    INST_SCRIPTS="/ubuntu/install/tools/install_tools_deluxe.sh \
+                  /ubuntu/install/misc/install_tools.sh \
+                  /ubuntu/install/chrome/install_chrome.sh \
+                  /ubuntu/install/vs_code/install_vs_code.sh \
+                  /ubuntu/install/nextcloud/install_nextcloud.sh \
+                  /ubuntu/install/composer/install_composer.sh \
+                  /ubuntu/install/cleanup/cleanup.sh"
 
-# Copy install scripts
-COPY ./install/ $INST_DIR
+# sudo support
+RUN apt-get update \
+    && apt-get install -y sudo \
+    && echo 'kasm-user ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && rm -rf /var/lib/apt/list/*
 
 # Install PHP
 RUN apt-get update && apt-get install -y \
@@ -35,6 +41,7 @@ RUN apt-get update && apt-get install -y \
         zip \
         curl \
         unzip \
+        php \
         php-mysqli \
         php-mysql \
         php-zip \
@@ -42,11 +49,8 @@ RUN apt-get update && apt-get install -y \
         php-pdo \
         php-pgsql
 
-# Setup sudo support
-RUN apt-get update \
-    && apt-get install -y sudo \
-    && echo 'kasm-user ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
-    && rm -rf /var/lib/apt/list/*
+# Copy install scripts
+COPY ./src/ $INST_DIR
 
 # Run installations
 RUN \
@@ -57,12 +61,15 @@ RUN \
   rm -f /etc/X11/xinit/Xclients && \
   chown 1000:0 $HOME && \
   mkdir -p /home/kasm-user && \
-  chown -R 1000:0 /home/kasm-user && \
-  rm -Rf ${INST_DIR}
+  chown -R 1000:0 /home/kasm-user
 
-# Userspace Runtime
+######### End Customizations ###########
+
+RUN chown 1000:0 $HOME
+RUN $STARTUPDIR/set_user_permission.sh $HOME
+
 ENV HOME /home/kasm-user
 WORKDIR $HOME
-USER 1000
+RUN mkdir -p $HOME && chown -R 1000:0 $HOME
 
-CMD ["--tail-log"]
+USER 1000
