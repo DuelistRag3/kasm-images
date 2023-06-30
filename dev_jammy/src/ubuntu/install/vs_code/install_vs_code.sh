@@ -1,8 +1,9 @@
-apt-get install wget gpg
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-rm -f packages.microsoft.gpg
-apt install apt-transport-https
-apt update
-apt install code
+#!/usr/bin/env bash
+set -ex
+wget -q https://update.code.visualstudio.com/latest/linux-deb-x64/stable -O vs_code_amd64.deb
+dpkg -i vs_code_amd64.deb
+sed -i 's#/usr/share/code/code#/usr/share/code/code --no-sandbox##' /usr/share/applications/code.desktop
+cp /usr/share/applications/code.desktop $HOME/Desktop
+chmod +x $HOME/Desktop/code.desktop
+chown 1000:1000 $HOME/Desktop/code.desktop
+rm vs_code_amd64.deb
