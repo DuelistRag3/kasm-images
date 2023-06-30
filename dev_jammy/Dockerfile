@@ -20,10 +20,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
                   /ubuntu/install/misc/install_tools.sh \
                   /ubuntu/install/misc/install_mariadb-server.sh \
                   /ubuntu/install/chrome/install_chrome.sh \
-                  /ubuntu/install/vs_code/install_vs_code.sh \
                   /ubuntu/install/nextcloud/install_nextcloud.sh \
                   /ubuntu/install/composer/install_composer.sh \
-                  /ubuntu/install/cleanup/cleanup.sh"
+                  /ubuntu/install/vs_code/install_vs_code.sh"
 
 # sudo support
 RUN apt-get update \
