@@ -1,5 +1,4 @@
-ARG BASE_TAG="develop"
-FROM kasmweb/core-ubuntu-bionic:$BASE_TAG
+FROM kasmweb/core-ubuntu-jammy:1.13.1
 
 USER root
 
@@ -13,20 +12,6 @@ ENV KASM_RX_HOME $STARTUPDIR/kasmrx
 ENV INST_SCRIPTS $STARTUPDIR/install
 
 ######### Customize Container Here ###########
-
-### Envrionment config
-ENV DEBIAN_FRONTEND=noninteractive \
-    SKIP_CLEAN=true \
-    KASM_RX_HOME=$STARTUPDIR/kasmrx \
-    DONT_PROMPT_WSL_INSTALL="No_Prompt_please" \
-    INST_DIR=$STARTUPDIR/install \
-    INST_SCRIPTS="/ubuntu/install/tools/install_tools_deluxe.sh \
-                  /ubuntu/install/misc/install_tools.sh \
-                  /ubuntu/install/misc/install_mariadb-server.sh \
-                  /ubuntu/install/chrome/install_chrome.sh \
-                  /ubuntu/install/nextcloud/install_nextcloud.sh \
-                  /ubuntu/install/composer/install_composer.sh \
-                  /ubuntu/install/vs_code/install_vs_code.sh"
 
 ### Install Tools
 COPY ./src/ubuntu/install/tools $INST_SCRIPTS/tools/
@@ -52,8 +37,8 @@ RUN bash $INST_SCRIPTS/vs_code/install_vs_code.sh  && rm -rf $INST_SCRIPTS/vs_co
 
 
 ### Install Slack
-COPY ./src/ubuntu/install/slack $INST_SCRIPTS/slack/
-RUN bash $INST_SCRIPTS/slack/install_slack.sh  && rm -rf $INST_SCRIPTS/slack/
+# COPY ./src/ubuntu/install/slack $INST_SCRIPTS/slack/
+# RUN bash $INST_SCRIPTS/slack/install_slack.sh  && rm -rf $INST_SCRIPTS/slack/
 
 
 ### Install NextCloud
@@ -63,6 +48,10 @@ RUN bash $INST_SCRIPTS/nextcloud/install_nextcloud.sh  && rm -rf $INST_SCRIPTS/n
 ### Install Teams
 COPY ./src/ubuntu/install/teams $INST_SCRIPTS/teams/
 RUN bash $INST_SCRIPTS/teams/install_teams.sh  && rm -rf $INST_SCRIPTS/teams/
+
+### Install nodejs
+COPY ./src/ubuntu/install/nodejs $INST_SCRIPTS/nodejs/
+RUN bash $INST_SCRIPTS/nodejs/install_nodejs.sh  && rm -rf $INST_SCRIPTS/nodejs/
 
 ### Install Only Office
 COPY ./src/ubuntu/install/only_office $INST_SCRIPTS/only_office/
@@ -95,6 +84,7 @@ RUN apt-get update && apt-get install -y \
         php-exif \
         php-pdo \
         php-curl \
+        php-xml \
         php-pgsql
 
 #ADD ./src/common/scripts $STARTUPDIR
