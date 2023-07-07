@@ -46,8 +46,8 @@ COPY ./src/ubuntu/install/nextcloud $INST_SCRIPTS/nextcloud/
 RUN bash $INST_SCRIPTS/nextcloud/install_nextcloud.sh  && rm -rf $INST_SCRIPTS/nextcloud/
 
 ### Install Teams
-COPY ./src/ubuntu/install/teams $INST_SCRIPTS/teams/
-RUN bash $INST_SCRIPTS/teams/install_teams.sh  && rm -rf $INST_SCRIPTS/teams/
+# COPY ./src/ubuntu/install/teams $INST_SCRIPTS/teams/
+# RUN bash $INST_SCRIPTS/teams/install_teams.sh  && rm -rf $INST_SCRIPTS/teams/
 
 ### Install nodejs
 COPY ./src/ubuntu/install/nodejs $INST_SCRIPTS/nodejs/
@@ -58,7 +58,7 @@ COPY ./src/ubuntu/install/only_office $INST_SCRIPTS/only_office/
 RUN bash $INST_SCRIPTS/only_office/install_only_office.sh  && rm -rf $INST_SCRIPTS/only_office/
 
 ### Remove maxmius
-RUN apt-get remove -y maximus
+#RUN apt-get remove -y maximus
 
 # sudo support
 RUN apt-get update \
